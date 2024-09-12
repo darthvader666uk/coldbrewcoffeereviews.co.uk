@@ -1,7 +1,7 @@
-title: Long Haul
-description: Long Form Jekyll theme built with SASS
+title: Cold Brew Coffee Reviews
+description: CBCR - Reviewing Coffee Specifically for Cold Brew Coffee
 
-url: https://long-haul.netlify.app
+url: https://www.coldbrewcoffeereviews.co.uk/
 # Only necessary when hosting your site in a sub-directory. Project sites hosted on GitHub Pages are the common use-case of this variable.
 baseurl: # Ex: /project-page
 paginate_path: "blog/page:num/"
@@ -38,4 +38,4 @@ social:
 google_analytics: "UA-58263416-1"
 
 disqus:
-    shortname: brianmaierjr
+    shortname: cbcr
