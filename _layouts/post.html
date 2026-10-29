@@ -31,18 +31,22 @@ layout: default
 </article>
 
 {%- if page.rating %}
+{%- if page.coffee %}{% assign product = page.roaster | append: ' ' | append: page.coffee %}{% else %}{% assign product = page.title | remove: ' Cold Brew Coffee Review' | remove: ' Review' %}{% endif %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Review",
   "name": {{ page.title | jsonify }},
+  "url": {{ page.url | absolute_url | jsonify }},
+  "description": {{ page.description | jsonify }},
   "datePublished": "{{ page.date | date_to_xmlschema }}",
   "author": { "@type": "Person", "name": {{ page.author | default: site.author | jsonify }} },
+  "publisher": { "@type": "Organization", "name": {{ site.title | jsonify }}, "url": {{ '/' | absolute_url | jsonify }} },
   "itemReviewed": {
     "@type": "Product",
-    "name": {{ page.coffee | default: page.title | jsonify }}{% if page.roaster %},
+    "name": {{ product | jsonify }}{% if page.roaster %},
     "brand": { "@type": "Brand", "name": {{ page.roaster | jsonify }} }{% endif %}{% if page.image %},
-    "image": {{ page.image | jsonify }}{% endif %}
+    "image": {{ page.image | absolute_url | jsonify }}{% endif %}
   },
   "reviewRating": { "@type": "Rating", "ratingValue": {{ page.rating }}, "bestRating": 5, "worstRating": 1 }
 }

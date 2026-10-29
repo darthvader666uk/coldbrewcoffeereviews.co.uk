@@ -40,3 +40,4 @@ exclude:
   - LICENSE
   - _vendor
   - vendor
+  - Blogger
