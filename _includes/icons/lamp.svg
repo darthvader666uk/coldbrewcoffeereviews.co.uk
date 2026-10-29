@@ -1,0 +1,12 @@
+<svg class="lamp" viewBox="0 0 40 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <circle class="lamp-metal" cx="20" cy="5" r="3.2" fill="none" stroke-width="2"/>
+  <path class="lamp-metal" d="M12 10 H28 L26 15 H14 Z"/>
+  <rect class="lamp-glass" x="13" y="15" width="14" height="25" rx="1.5"/>
+  <path class="lamp-flame" d="M20 21 C23 26 24 30 22.5 33 C21.8 34.6 18.2 34.6 17.5 33 C16 30 17 26 20 21 Z"/>
+  <rect class="lamp-metal" x="11" y="15" width="2.4" height="25"/>
+  <rect class="lamp-metal" x="26.6" y="15" width="2.4" height="25"/>
+  <rect class="lamp-metal" x="18.8" y="15" width="2.4" height="5"/>
+  <path class="lamp-metal" d="M9 40 H31 L32 44 H8 Z"/>
+  <rect class="lamp-base" x="8" y="44" width="24" height="14" rx="2"/>
+  <rect class="lamp-metal" x="6" y="58" width="28" height="4" rx="1.5"/>
+</svg>

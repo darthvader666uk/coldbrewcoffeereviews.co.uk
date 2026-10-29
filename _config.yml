@@ -1,41 +1,43 @@
-title: Cold Brew Coffee Reviews
-description: CBCR - Reviewing Coffee Specifically for Cold Brew Coffee
+# Site identity. Swap these when the new name is picked.
+title: Last Shift Coffee
+tagline: Cold coffee reviews from the Valleys.
+description: Coffee from Welsh and UK roasters, reviewed as cold brew and cold-pressed espresso, with a 1 to 5 bean score.
+author: Stuart Nightingale
+lang: en-GB
 
-url: https://www.coldbrewcoffeereviews.co.uk/
-# Only necessary when hosting your site in a sub-directory. Project sites hosted on GitHub Pages are the common use-case of this variable.
-baseurl: # Ex: /project-page
-paginate_path: "blog/page:num/"
-permalink: blog/:title/
+# Change to the new domain once it is registered
+url: https://www.coldbrewcoffeereviews.co.uk
+baseurl: ""
+permalink: /:year/:month/:title.html
+paginate: 9
+paginate_path: "/blog/page:num/"
 
-# Header Option
-# header: large
+plugins:
+  - jekyll-paginate
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-feed
 
-sass:
-    style: compressed
-
-markdown: kramdown
-highlighter: rouge
-plugins: [jekyll-paginate]
-paginate: 5
+defaults:
+  - scope: { type: posts }
+    values: { layout: post }
 
 navigation:
-    - title: Home
-      url: /index.html
-    - title: About
-      url: /about
-    - title: Contact
-      url: /contact
-
-social:
-    github: brianmaierjr
-    twitter: brianmaierjr
-    facebook: brianmaierjr
-    email: brimaidesigns@gmail.com
-    linkedin: brianmaierjr
-    youtube: RickAstleyYT
-    tumblr: i-am-a-fish
+  - title: Reviews
+    url: /reviews/
+  - title: My Setup
+    url: /p/my-cold-brew-coffee-setup.html
+  - title: About
+    url: /about/
+  - title: Contact
+    url: /contact/
 
 google_analytics: "G-N4SS677RZE"
 
-disqus:
-    shortname: cbcr
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - LICENSE
+  - _vendor
+  - vendor

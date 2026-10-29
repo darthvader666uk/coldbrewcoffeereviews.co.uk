@@ -1,0 +1,40 @@
+---
+title: Roaster Coffee Name Review
+author: Stuart Nightingale
+tags:
+- Review
+coffee: "Coffee Name"
+roaster: "Roaster Name"
+method: Cold Brew            # or Cold Press Espresso
+rating: 3                    # 1 to 5 beans
+image: /assets/img/reviews/slug.jpg
+description: "Roaster Coffee Name from Town. One line on the taste. Scores X beans out of 5."
+scorecard:
+  flavour: 3
+  smoothness: 3
+  strength: 3
+  value: 3
+  availability: 3
+# notice: "Optional update box shown above the review."
+# Copy this file to _drafts/slug.html to start a review. Move it to _posts/YYYY-MM-DD-slug.html to publish.
+# The URL comes from the file name: _posts/YYYY-MM-DD-slug.html becomes /YYYY/MM/slug.html
+---
+
+<p>Intro: where you found it and why it caught your eye.</p>
+
+<h3>The Coffee</h3>
+<p>Roaster, origin, roast level, tasting notes on the bag, price and bag size, with a link to buy.</p>
+
+<h3>Setup</h3>
+<p>Machine and settings, grams of coffee, water, grind and brew time.</p>
+
+<h3>The Taste</h3>
+<p>First cup, the ratio you settled on, and what came through. Note anything with milk too.</p>
+
+<h3>Considerations</h3>
+<p>Price per kilo, availability, anything that would put someone off.</p>
+
+<h3>The Score</h3>
+<p>Overall, I will give it <b>X beans out of 5</b>.</p>
+<div class="separator" style="text-align: center;">{% for i in (1..page.rating) %}<img src="{{ '/assets/img/reviews/shared/01-image.png' | relative_url }}" alt="" width="83" height="83"> {% endfor %}</div>
+

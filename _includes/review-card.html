@@ -1,0 +1,13 @@
+{%- assign p = include.post -%}
+<article class="card">
+  <a class="card-link" href="{{ p.url | relative_url }}">
+    {%- if p.image %}
+    <img class="card-img" src="{{ p.image | relative_url }}" alt="" loading="lazy" width="640" height="360">
+    {%- endif %}
+    <div class="card-body">
+      {%- if p.rating %}{% include beans.html rating=p.rating %}{% endif %}
+      <h3 class="card-title">{{ p.title | remove: ' Cold Brew Coffee Review' | remove: ' Coffee Review' }}</h3>
+      <p class="card-meta">{% if p.roaster %}{{ p.roaster }} &middot; {% endif %}{{ p.date | date: '%-d %b %Y' }}</p>
+    </div>
+  </a>
+</article>

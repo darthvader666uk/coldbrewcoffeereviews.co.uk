@@ -1,0 +1,6 @@
+{%- assign score = include.rating | plus: 0 -%}
+<span class="beans" role="img" aria-label="{{ score }} beans out of 5">
+  {%- for i in (1..5) -%}
+  <svg class="bean{% if i <= score %} on{% endif %}" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="12" rx="7.5" ry="10.5" transform="rotate(35 12 12)"/><path d="M8.2 18.6 C12.5 14.5 10.8 9.6 15.8 5.4" fill="none" stroke-width="1.6" stroke-linecap="round"/></svg>
+  {%- endfor -%}
+</span>

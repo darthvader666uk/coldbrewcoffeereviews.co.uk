@@ -1,16 +1,13 @@
- <div class="header {% if site.header == 'large' %}header--large{% endif %}">
-     <div class="container">
-         <h1 class="logo"><a href="{{ '/' | relative_url }}">{{ site.title }}</a></h1>
-         <nav class="nav-collapse">
-             <ul class="noList">
-                 {%- for link in site.navigation -%}{%- assign current = nil -%}{%- if page.url contains link.url or forloop.first and page.url == '/' or page.url == 'index.html' -%}{%- assign current = 'current' -%}{%- endif -%}
-                 <li class="element {%- if forloop.first -%}first{%- endif -%} {{ current }} {%- if forloop.last -%}last{%- endif -%}">
-                     <a href="{{ link.url | relative_url }}">{{ link.title }}</a>
-                 </li>
-                 {%- endfor -%}
-                 <li> <a href="https://github.com/brianmaierjr/long-haul" target="_blank">GitHub</a></li>
-                 <li><a href="https://github.com/brianmaierjr/long-haul/archive/master.zip">Download Theme</a></li>
-             </ul>
-         </nav>
-     </div>
- </div><!-- end .header -->
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="{{ '/' | relative_url }}">
+      {% include icons/lamp.svg %}
+      <span class="brand-name">{{ site.title }}</span>
+    </a>
+    <nav class="site-nav" aria-label="Main">
+      {%- for link in site.navigation %}
+      <a href="{{ link.url | relative_url }}"{% if page.url == link.url %} aria-current="page"{% endif %}>{{ link.title }}</a>
+      {%- endfor %}
+    </nav>
+  </div>
+</header>

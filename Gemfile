@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gem "jekyll"
 gem "jekyll-paginate"
-gem "support-for"
-gem "http_parser"
+gem "jekyll-seo-tag"
+gem "jekyll-sitemap"
+gem "jekyll-feed"
 gem "webrick", "~> 1.7"
- 

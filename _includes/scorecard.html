@@ -1,0 +1,11 @@
+<section class="scorecard">
+  <h2>The Scorecard</h2>
+  <dl>
+    {%- for row in page.scorecard %}
+    <div class="score-row">
+      <dt>{{ row[0] | capitalize }}</dt>
+      <dd><span class="score-bar" style="--score: {{ row[1] }}"></span><span class="score-num">{{ row[1] }}/5</span></dd>
+    </div>
+    {%- endfor %}
+  </dl>
+</section>

@@ -1,0 +1,18 @@
+---
+layout: default
+title: All Reviews
+permalink: /reviews/
+description: "Every coffee reviewed so far, newest first, with its bean score."
+---
+<h1 class="page-title">All Reviews</h1>
+{%- assign years = site.posts | group_by_exp: "p", "p.date | date: '%Y'" %}
+{%- for year in years %}
+<section>
+  <h2 class="section-title">{{ year.name }}</h2>
+  <div class="grid">
+    {%- for post in year.items %}
+    {% include review-card.html post=post %}
+    {%- endfor %}
+  </div>
+</section>
+{%- endfor %}
