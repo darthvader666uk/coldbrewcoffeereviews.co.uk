@@ -1,12 +1,11 @@
-# Site identity. Swap these when the new name is picked.
+# Site identity
 title: Last Shift Coffee
 tagline: Cold coffee reviews from the Valleys.
 description: Coffee from Welsh and UK roasters, reviewed as cold brew and cold-pressed espresso, with a 1 to 5 bean score.
 author: Stuart Nightingale
 lang: en-GB
 
-# Change to the new domain once it is registered
-url: https://www.coldbrewcoffeereviews.co.uk
+url: https://www.lastshiftcoffee.co.uk
 baseurl: ""
 permalink: /:year/:month/:title.html
 paginate: 9
