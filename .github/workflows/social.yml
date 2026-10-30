@@ -1,0 +1,56 @@
+name: Social
+
+# New review pushed to master -> share it on Bluesky, Facebook and Instagram.
+# Every morning -> phone notification (ntfy) if anyone commented, replied or messaged.
+on:
+  push:
+    branches: [master]
+    paths: ['_posts/**']
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+    inputs:
+      post:
+        description: 'Share this post again, e.g. _posts/2026-10-29-slug.html. Leave empty to run the digest.'
+        required: false
+
+concurrency:
+  group: social
+  cancel-in-progress: false
+
+env:
+  META_PAGE_TOKEN: ${{ secrets.META_PAGE_TOKEN }}
+  META_PAGE_ID: ${{ secrets.META_PAGE_ID }}
+  META_IG_ID: ${{ secrets.META_IG_ID }}
+  BSKY_HANDLE: ${{ secrets.BSKY_HANDLE }}
+  BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
+  NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+
+jobs:
+  announce:
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.post != '')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Share new reviews
+        env:
+          BEFORE: ${{ github.event.before }}
+          POST: ${{ inputs.post }}
+        run: |
+          if [ -n "$POST" ]; then
+            files="$POST"
+          else
+            files=$(git diff --name-only --diff-filter=A "$BEFORE" "$GITHUB_SHA" -- '_posts/*.html' '_posts/*.md' 2>/dev/null || true)
+          fi
+          if [ -z "$files" ]; then echo "No new reviews in this push."; exit 0; fi
+          python3 scripts/social.py announce $files
+
+  digest:
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.post == '')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Daily digest
+        run: python3 scripts/social.py digest

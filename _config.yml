@@ -41,3 +41,5 @@ exclude:
   - _vendor
   - vendor
   - Blogger
+  - scripts
+  - brand
