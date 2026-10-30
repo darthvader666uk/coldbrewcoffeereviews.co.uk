@@ -1,6 +1,7 @@
 """Share new reviews on social media, and send a daily digest of replies.
 
   python scripts/social.py announce <post file>... [--dry-run]
+  python scripts/social.py archive scripts/archive.txt [--dry-run]   (posts whatever is dated today)
   python scripts/social.py digest [--dry-run]
 
 Credentials come from environment variables (GitHub secrets):
@@ -96,11 +97,13 @@ def parse_time(s):
 def wait_until_live(url, minutes=15):
     for _ in range(minutes * 4):
         try:
-            http('GET', url)
+            req = urllib.request.Request(url, headers={'User-Agent': 'last-shift-coffee/1.0'})
+            with urllib.request.urlopen(req, timeout=30) as r:
+                if r.status == 200:
+                    return True
         except Exception:
-            time.sleep(15)
-            continue
-        return True
+            pass
+        time.sleep(15)
     return False
 
 
@@ -112,7 +115,7 @@ def bluesky_session():
 
 
 def post_bluesky(p):
-    text = f"New review: {p['title']}\n\n{beans(p.get('rating'))}"
+    text = f"{p['lead']}: {p['title']}\n\n{beans(p.get('rating'))}"
     if len(text) > 280:
         text = text[:277] + '...'
     if DRY:
@@ -135,7 +138,7 @@ def post_bluesky(p):
 
 
 def post_facebook(p):
-    message = f"New review: {p['title']}\n\n{p.get('description', '')}\n\n{beans(p.get('rating'))}"
+    message = f"{p['lead']}: {p['title']}\n\n{p.get('description', '')}\n\n{beans(p.get('rating'))}"
     if DRY:
         return print('  facebook (dry run):', message.replace('\n', ' | '))
     r = graph('POST', f"{ENV('META_PAGE_ID')}/feed", message=message, link=p['url'])
@@ -145,7 +148,7 @@ def post_facebook(p):
 def post_instagram(p):
     if not p['image_url'].lower().endswith(('.jpg', '.jpeg')):
         return print('  instagram: skipped, Instagram only accepts JPEG and the main image is', p['image_url'].rsplit('.', 1)[-1])
-    caption = (f"New review: {p['title']}\n\n{p.get('description', '')}\n\n{beans(p.get('rating'))}\n\n"
+    caption = (f"{p['lead']}: {p['title']}\n\n{p.get('description', '')}\n\n{beans(p.get('rating'))}\n\n"
                f"Full review at lastshiftcoffee.co.uk\n\n{HASHTAGS}")
     if DRY:
         return print('  instagram (dry run):', caption.replace('\n', ' | ')[:200])
@@ -159,10 +162,12 @@ def post_instagram(p):
     print('  instagram: posted', graph('GET', r['id'], fields='permalink').get('permalink'))
 
 
-def announce(files):
+def announce(files, archive=False):
     failed = []
     for f in files:
+        f = f.strip().strip('`\'"').rstrip('.,')
         p = front_matter(f)
+        p['lead'] = f'From the archive ({os.path.basename(f)[:4]})' if archive else 'New review'
         print('Announcing', p['url'])
         if not DRY and not wait_until_live(p['url']):
             failed.append(f'{f}: page never went live')
@@ -264,6 +269,13 @@ if __name__ == '__main__':
     args = [a for a in sys.argv[1:] if a != '--dry-run']
     if args[:1] == ['announce']:
         announce(args[1:])
+    elif args[:1] == ['archive']:
+        today = dt.datetime.now(dt.timezone.utc).date().isoformat()
+        due = [line.split()[1] for line in open(args[1]) if line.startswith(today)]
+        if due:
+            announce(due, archive=True)
+        else:
+            print('Nothing in the archive list for', today)
     elif args[:1] == ['digest']:
         digest()
     else:

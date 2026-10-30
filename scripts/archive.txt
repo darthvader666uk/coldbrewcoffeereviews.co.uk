@@ -1,0 +1,13 @@
+# Old reviews shared as "From the archive", one per line: date (UTC) and post.
+# The Social workflow runs Tuesday and Friday at 18:00 UTC and posts whatever is dated that day.
+# To reschedule, change a date. To add more, add a line.
+2026-11-03 _posts/2024-01-08-coffea-depuis-brazil-espirito-santo.html
+2026-11-06 _posts/2024-01-10-asda-extra-special-brazilian-roast.html
+2026-11-10 _posts/2024-01-31-white-rose-coffee-roasters-brazil.html
+2026-11-13 _posts/2024-02-16-antonia-and-panesar-peaky-blinders.html
+2026-11-17 _posts/2024-02-23-white-rose-coffee-roasters-brazil-nuts.html
+2026-11-20 _posts/2024-03-01-Scout-Coffee-Roasters-Basecamp-ColdBrew-Coffee-Review.html
+2026-11-24 _posts/2024-03-08-ferraris-siena-cold-brew-coffee-review.html
+2026-11-27 _posts/2024-06-05-bridge-coffee-roasters-cold-brew-coffee.html
+2026-12-01 _posts/2024-07-25-hard-lines-colombia-el-carmen-cold-brew.html
+2026-12-04 _posts/2024-01-03-hard-lines-coffee-christmas-blend-2023.html
