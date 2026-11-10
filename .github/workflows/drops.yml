@@ -1,0 +1,74 @@
+name: Drops
+
+# Every hour -> check UK roasters for new coffees and restocks, alert #instant-drops on Discord.
+# Friday morning -> write the week's roundup post, publish it, then link it in #weekly-drops.
+# Bot state (seen coffees, stock, last 30 days of drops) lives on the bot-state branch as a single
+# commit, so hourly runs never touch master or trigger a Pages build.
+on:
+  schedule:
+    - cron: '17 * * * *'
+    - cron: '30 7 * * 5'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'check or roundup'
+        required: true
+        default: check
+
+concurrency:
+  group: drops
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: write
+
+env:
+  DISCORD_INSTANT_WEBHOOK: ${{ secrets.DISCORD_INSTANT_WEBHOOK }}
+  DISCORD_WEEKLY_WEBHOOK: ${{ secrets.DISCORD_WEEKLY_WEBHOOK }}
+
+jobs:
+  check:
+    if: (github.event_name == 'schedule' && github.event.schedule == '17 * * * *') || inputs.mode == 'check'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Load state
+        run: git fetch -q origin bot-state && git show origin/bot-state:drops-state.json > drops-state.json || echo "No state yet, first run records only."
+      - name: Check roasters
+        run: python3 scripts/drops.py check --state drops-state.json
+      - name: Save state
+        if: always() && hashFiles('drops-state.json') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tmp=$(mktemp -d) && cp drops-state.json "$tmp/" && cd "$tmp"
+          git init -q -b bot-state
+          git add drops-state.json
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -qm 'Drops state'
+          git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" bot-state
+
+  roundup:
+    if: (github.event_name == 'schedule' && github.event.schedule == '30 7 * * 5') || inputs.mode == 'roundup'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Load state
+        run: git fetch -q origin bot-state && git show origin/bot-state:drops-state.json > drops-state.json
+      - name: Write the post
+        run: python3 scripts/drops.py roundup --state drops-state.json
+      - name: Publish it
+        id: publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add _posts
+          if git diff --cached --quiet; then echo "Nothing to publish."; exit 0; fi
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -qm "Coffee drops for $(date '+%-d %B %Y')"
+          git pull -q --rebase origin master && git push -q origin HEAD:master
+          # Pushes made with the workflow token don't start a Pages build on their own
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/pages/builds" --silent
+          echo "published=yes" >> "$GITHUB_OUTPUT"
+      - name: Tell #weekly-drops
+        if: steps.publish.outputs.published == 'yes'
+        run: python3 scripts/drops.py roundup --state drops-state.json

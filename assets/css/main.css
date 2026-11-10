@@ -144,3 +144,17 @@ main.wrap { padding-top: 2.5rem; padding-bottom: 4rem; min-height: 60vh; }
   .post-nav .next { grid-column: 1; }
   .score-row { grid-template-columns: 6rem 1fr; }
 }
+
+/* Call-to-action button (the /drops/ page) */
+.cta {
+  display: inline-block;
+  background: var(--red);
+  color: var(--bg);
+  font-family: var(--display);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: .7em 1.3em;
+  border-radius: var(--radius);
+  text-decoration: none;
+}
+.cta:hover { background: var(--red-soft); color: var(--bg); }

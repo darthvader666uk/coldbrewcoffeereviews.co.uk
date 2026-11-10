@@ -24,6 +24,8 @@ defaults:
 navigation:
   - title: Reviews
     url: /reviews/
+  - title: Drops
+    url: /drops/
   - title: My Setup
     url: /p/my-cold-brew-coffee-setup.html
   - title: About

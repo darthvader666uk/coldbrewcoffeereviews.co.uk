@@ -1,0 +1,29 @@
+# UK roasters checked by scripts/drops.py (Shopify /products.json only).
+# Checked 2 Nov 2026. Blocked with a 429 then (retry later): Hard Lines, Ferraris,
+# Square Mile, Dark Arts, Assembly, Ozone, Workshop, North Star, Crankhouse,
+# Round Hill, Yallah, Colonna, Dark Woods, Foundry, Steampunk, Horsham,
+# 200 Degrees, Grind.
+- name: Scout Coffee
+  url: https://scoutcoffee.co.uk
+- name: White Rose Coffee Roasters
+  url: https://whiterosecoffeeroasters.co.uk
+- name: Has Bean
+  url: https://hasbean.co.uk
+- name: Origin Coffee
+  url: https://origincoffee.co.uk
+- name: Quarter Horse
+  url: https://quarterhorsecoffee.com
+- name: Clifton Coffee
+  url: https://cliftoncoffee.co.uk
+- name: Girls Who Grind Coffee
+  url: https://girlswhogrindcoffee.com
+- name: Union
+  url: https://unionroasted.com
+- name: Kiss the Hippo
+  url: https://kissthehippo.com
+- name: Red Bank
+  url: https://redbankcoffee.co.uk
+- name: Caravan
+  url: https://caravanandco.com
+- name: Rave Coffee
+  url: https://ravecoffee.co.uk
