@@ -33,6 +33,13 @@ KEEP_DAYS = 30
 DRY = '--dry-run' in sys.argv
 ENV = os.environ.get
 
+# Roundup openers, one per week in turn. Blog voice: calm, no questions to the reader.
+INTROS = [
+    'Fresh off the roaster, here are this week\'s new coffees.',
+    'Another week, another pile of beans to get through.',
+    'New beans have landed, so here\'s what turned up this week.',
+    'The roasters have been busy, and the bot has been keeping score.',
+]
 # Checked against the product type and title only: tags often carry tasting notes ("chocolate").
 NOT_COFFEE = re.compile(
     r'gift|voucher|\bcards?\b|subscri|merch|equipment|brewer|brewing|grinder|kettle|\bscales?\b|'
@@ -99,6 +106,10 @@ def price(p):
     prices = [float(v['price']) for v in p.get('variants', [])
               if v.get('available') and v.get('price') and not GREEN.search(v.get('title') or '')]
     return f'£{min(prices):.2f}' if prices else ''
+
+
+def plural(count, word):
+    return f'{count} {word}{"" if count == 1 else "s"}'
 
 
 def load(path):
@@ -171,21 +182,27 @@ def roundup(state_path):
     for d in drops:
         by_roaster.setdefault(d['roaster'], []).append(d)
     nice = f'{today.day} {today:%B %Y}'
-    body = [f'<p>{len(drops)} new coffees from {len(by_roaster)} UK roasters this week. '
-            'Every link goes straight to the roaster.</p>']
+    coffees, shops = plural(len(drops), 'coffee'), plural(len(by_roaster), 'UK roaster')
+    busiest = sorted(by_roaster, key=lambda n: -len(by_roaster[n]))[:2]
+    body = [f'<p class="intro">{INTROS[today.isocalendar()[1] % len(INTROS)]}</p>',
+            f'<p>The drops bot spotted {coffees} from {shops} this week. Every link goes straight to the roaster, '
+            "so they get the sale (and some of these won't hang around long).</p>"]
     for name, items in sorted(by_roaster.items()):
         body.append(f'\n<h3>{html.escape(name)}</h3>\n<ul>')
-        body += [f'<li><a href="{html.escape(d["url"])}">{html.escape(d["title"])}</a> {d["price"]}</li>' for d in items]
+        body += [f'<li><a href="{html.escape(d["url"])}">{html.escape(d["title"])}</a>'
+                 f'{", " + d["price"] if d["price"] else ""}</li>' for d in items]
         body.append('</ul>')
-    body.append('\n<p>Want them the moment they land? <a href="/drops/">Join Last Shift Coffee Drops</a>.</p>')
+    body.append("\n<p>Drops Members get these the moment the bot spots them, in #instant-drops on the Last Shift Coffee "
+                "Discord. The details are on the <a href=\"{{ '/drops/' | relative_url }}\">Coffee Drops</a> page.</p>")
     slug = f'coffee-drops-{today:%Y-%m-%d}'   # URLs are /:year/:month/:title.html, so the date keeps them unique
     post = '\n'.join([
         '---',
-        f'title: "Coffee Drops: New UK Coffees, Week Ending {nice}"',
+        f'title: "Coffee Drops: {plural(len(drops), "New UK Coffee")}, Week Ending {nice}"',
         'author: Stuart Nightingale',
         'method: Coffee Drops',
         'tags:\n- Drops',
-        f'description: "{len(drops)} new coffees from {len(by_roaster)} UK speciality roasters this week."',
+        f'description: "{plural(len(drops), "new coffee")} from '
+        + (f'{busiest[0]} this week."' if len(by_roaster) == 1 else f'{shops} this week, including {" and ".join(busiest)}."'),
         '---', '', *body, ''])
     path = os.path.join(ROOT, '_posts', f'{today:%Y-%m-%d}-{slug}.html')
     url = f'{SITE}/{today:%Y/%m}/{slug}.html'
@@ -204,8 +221,8 @@ def roundup(state_path):
                 time.sleep(30)
         else:
             sys.exit(f'{url} still not live after 15 minutes, Discord not told')
-    discord('DISCORD_WEEKLY_WEBHOOK', f'**This week\'s coffee drops:** {len(drops)} new coffees from '
-                                      f'{len(by_roaster)} UK roasters\n{url}')
+    discord('DISCORD_WEEKLY_WEBHOOK', f"**This week's coffee drops:** {plural(len(drops), 'new coffee')} from "
+                                      f"{plural(len(by_roaster), 'UK roaster')}\n{url}")
 
 
 if __name__ == '__main__':
