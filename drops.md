@@ -6,7 +6,7 @@ description: "New coffees and restocks from UK speciality roasters, checked ever
 ---
 
 <p class="intro">Good coffee from the smaller roasters sells out fast, and the new ones turn up with no warning. So I built a bot to keep an eye on them for me.</p>
-<p>Every hour it checks 26 UK speciality roasters (Welsh ones like Hard Lines, Coaltown and Dusty Ape, plus Has Bean, Origin, Ozone and plenty more) for new coffees and anything that's back in stock. Every link goes straight to the roaster, so they get the sale.</p>
+<p>Every hour it checks 26 UK speciality roasters (Welsh ones like Hard Lines, Coaltown and Scout, plus Has Bean, Origin, Ozone and plenty more) for new coffees and anything that's back in stock. Every link goes straight to the roaster, so they get the sale.</p>
 
 <h2>Free: the weekly roundup</h2>
 <p>Every Friday morning the week's new coffees go up here on the blog and in #weekly-drops on the Last Shift Coffee Discord. The blog needs no sign up, and the Discord is free to join.</p>
@@ -16,6 +16,11 @@ description: "New coffees and restocks from UK speciality roasters, checked ever
 <p>Drops Members get every new coffee and restock the moment the bot spots it, in #instant-drops, plus a members chat. It's handy for the limited lots that are gone well before Friday.</p>
 <p>It runs through Buy Me a Coffee and, once you've joined, connect your Discord on the membership page and the role is added for you. Cancel any time and it's taken off again.</p>
 <p><a class="cta" href="https://buymeacoffee.com/darthvader666uk/membership" target="_blank" rel="noopener">Become a Drops Member</a></p>
+
+<h2>Roaster of the week</h2>
+{%- assign pick_index = site.time | date: '%U' | plus: 0 | modulo: site.data.roasters.size -%}
+{%- assign pick = site.data.roasters[pick_index] %}
+<p><a href="{{ pick.url }}" target="_blank" rel="noopener">{{ pick.name }}</a> in {{ pick.town }}. All {{ site.data.roasters.size }} roasters the bot watches are on the <a href="{{ '/roasters/' | relative_url }}">UK coffee roasters</a> page.</p>
 
 <h2>Missing a roaster?</h2>
 <p>Pop it in #roaster-requests on the Discord. The bot can only read shops that run on Shopify (most of them do), but I'll add any I can.</p>

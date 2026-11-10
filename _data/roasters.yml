@@ -1,81 +1,140 @@
-# UK roasters checked by scripts/drops.py (Shopify /products.json only).
+# UK roasters: checked by scripts/drops.py (Shopify /products.json) and listed on /roasters/.
 # type: optional regex on the shop's own product_type (beans only). Without it a keyword filter guesses.
-# Types and the extra shops come from ~/frontpage/app/feeds.json, where they are tested.
+# Types and most shops come from ~/frontpage/app/feeds.json, where they are tested.
+# area: the /roasters/ section, in the order first used here (Wales first).
+# reviewed_as: the roaster: value on this blog's review posts, to link them.
+# Towns checked 10 Nov 2026 (roaster sites first).
 # Not yet tried from GitHub: Ferraris, Square Mile, Dark Arts, Workshop, North Star, Crankhouse,
 # Round Hill, Yallah, Colonna, Steampunk, Grind.
 
-# Welsh
 - name: Hard Lines
   url: https://hard-lines.co.uk
   type: ^coffee$
-- name: Coaltown Coffee
-  url: https://www.coaltowncoffee.co.uk
-  type: ^Coffee$
-- name: Dusty Ape
-  url: https://dustyape.com
-  type: ^(Single Origin|Coffee Blend)$
-- name: Black Mountain Roast
-  url: https://blackmountainroast.com
-  type: ^(decaf )?Coffee$
+  town: Cardiff
+  area: Wales
+  reviewed_as: Hard Lines Coffee
 - name: Quantum Coffee Roasters
   url: https://quantumroasters.co.uk
   type: ^Coffee$
-
-# Reviewed on the blog
+  town: Cardiff
+  area: Wales
 - name: Scout Coffee
   url: https://scoutcoffee.co.uk
-- name: White Rose Coffee Roasters
-  url: https://whiterosecoffeeroasters.co.uk
-- name: Caffè Prima
-  url: https://www.caffeprima.co.uk
+  town: Newport
+  area: Wales
+  reviewed_as: Scout Coffee Roasters
+- name: Coaltown Coffee
+  url: https://www.coaltowncoffee.co.uk
   type: ^Coffee$
+  town: Ammanford
+  area: Wales
+- name: Black Mountain Roast
+  url: https://blackmountainroast.com
+  type: ^(decaf )?Coffee$
+  town: Hay-on-Wye
+  area: Wales
 
-# Rest of the UK
-- name: Has Bean
-  url: https://hasbean.co.uk
-  type: ^coffee$
-- name: Origin Coffee
-  url: https://origincoffee.co.uk
-- name: Quarter Horse
-  url: https://quarterhorsecoffee.com
-- name: Clifton Coffee
-  url: https://cliftoncoffee.co.uk
-- name: Girls Who Grind Coffee
-  url: https://girlswhogrindcoffee.com
-  type: ^Coffee$
 - name: Union
   url: https://unionroasted.com
+  town: Silvertown
+  area: London
 - name: Kiss the Hippo
   url: https://kissthehippo.com
   type: ^Coffee$
-- name: Red Bank
-  url: https://redbankcoffee.co.uk
+  town: Enfield
+  area: London
 - name: Caravan
   url: https://caravanandco.com
-- name: Rave Coffee
-  url: https://ravecoffee.co.uk
-  type: ^(Single Origin|Blend)$
+  town: London
+  area: London
 - name: Ozone Coffee
   url: https://ozonecoffee.co.uk
   type: ^coffee$
+  town: Shoreditch
+  area: London
 - name: Volcano Coffee Works
   url: https://volcanocoffeeworks.com
   type: ^coffee$
-- name: Dark Woods Coffee
-  url: https://darkwoodscoffee.co.uk
-  type: ^coffee$
-- name: 200 Degrees
-  url: https://200degs.com
-  type: ^Coffee Bean$
+  town: Brixton
+  area: London
 - name: Mission Coffee Works
   url: https://missioncoffeeworks.com
   type: ^Coffee$
+  town: Peckham
+  area: London
 - name: Assembly Coffee
   url: https://assemblycoffee.co.uk
   type: ^Coffee$
+  town: Brixton
+  area: London
+
+- name: Clifton Coffee
+  url: https://cliftoncoffee.co.uk
+  town: Bristol
+  area: the South West
+- name: Rave Coffee
+  url: https://ravecoffee.co.uk
+  type: ^(Single Origin|Blend)$
+  town: Cirencester
+  area: the South West
+- name: Dusty Ape
+  url: https://dustyape.com
+  type: ^(Single Origin|Coffee Blend)$
+  town: Trowbridge
+  area: the South West
+- name: Girls Who Grind Coffee
+  url: https://girlswhogrindcoffee.com
+  type: ^Coffee$
+  town: Warminster
+  area: the South West
+- name: Origin Coffee
+  url: https://origincoffee.co.uk
+  town: Helston
+  area: the South West
+
+- name: Quarter Horse
+  url: https://quarterhorsecoffee.com
+  town: Birmingham
+  area: the Midlands
+- name: Has Bean
+  url: https://hasbean.co.uk
+  type: ^coffee$
+  town: Stafford
+  area: the Midlands
+- name: 200 Degrees
+  url: https://200degs.com
+  type: ^Coffee Bean$
+  town: Nottingham
+  area: the Midlands
+
+- name: White Rose Coffee Roasters
+  url: https://whiterosecoffeeroasters.co.uk
+  town: Halifax
+  area: the North
+  reviewed_as: White Rose Coffee Roasters
+- name: Dark Woods Coffee
+  url: https://darkwoodscoffee.co.uk
+  type: ^coffee$
+  town: Marsden
+  area: the North
 - name: Foundry Coffee Roasters
   url: https://foundrycoffeeroasters.com
   type: ^Coffee Beans$
+  town: Sheffield
+  area: the North
+- name: Caffè Prima
+  url: https://www.caffeprima.co.uk
+  type: ^Coffee$
+  town: Haydock
+  area: the North
+  reviewed_as: Caffé Prima
+- name: Red Bank
+  url: https://redbankcoffee.co.uk
+  town: Coniston
+  area: the North
+
 - name: Horsham Coffee Roaster
   url: https://www.horshamcoffeeroaster.co.uk
   type: ^Coffee$
+  town: Horsham
+  area: the South East
