@@ -10,12 +10,12 @@ description: "New coffees and restocks from UK speciality roasters, checked ever
 
 <h2>Free: the weekly roundup</h2>
 <p>Every Friday morning the week's new coffees go up here on the blog and in #weekly-drops on the Last Shift Coffee Discord. The blog needs no sign up, and the Discord is free to join.</p>
-<p><a class="cta" href="https://discord.gg/xzEjd4888q">Join the Discord</a></p>
+<p><a class="cta" href="https://discord.gg/xzEjd4888q" target="_blank" rel="noopener">Join the Discord</a></p>
 
 <h2>Drops Member: £3 a month</h2>
 <p>Drops Members get every new coffee and restock the moment the bot spots it, in #instant-drops, plus a members chat. It's handy for the limited lots that are gone well before Friday.</p>
 <p>It runs through Buy Me a Coffee and, once you've joined, connect your Discord on the membership page and the role is added for you. Cancel any time and it's taken off again.</p>
-<p><a class="cta" href="https://buymeacoffee.com/darthvader666uk/membership">Become a Drops Member</a></p>
+<p><a class="cta" href="https://buymeacoffee.com/darthvader666uk/membership" target="_blank" rel="noopener">Become a Drops Member</a></p>
 
 <h2>Missing a roaster?</h2>
 <p>Pop it in #roaster-requests on the Discord. The bot can only read shops that run on Shopify (most of them do), but I'll add any I can.</p>
