@@ -6,7 +6,7 @@ description: "New coffees and restocks from UK speciality roasters, checked ever
 ---
 
 <p class="intro">Good coffee from the smaller roasters sells out fast, and the new ones turn up with no warning. So I built a bot to keep an eye on them for me.</p>
-<p>Every hour it checks 12 UK speciality roasters (Scout, White Rose, Has Bean, Origin and a few more) for new coffees and anything that's back in stock. Every link goes straight to the roaster, so they get the sale.</p>
+<p>Every hour it checks 26 UK speciality roasters (Welsh ones like Hard Lines, Coaltown and Dusty Ape, plus Has Bean, Origin, Ozone and plenty more) for new coffees and anything that's back in stock. Every link goes straight to the roaster, so they get the sale.</p>
 
 <h2>Free: the weekly roundup</h2>
 <p>Every Friday morning the week's new coffees go up here on the blog and in #weekly-drops on the Last Shift Coffee Discord. The blog needs no sign up, and the Discord is free to join.</p>

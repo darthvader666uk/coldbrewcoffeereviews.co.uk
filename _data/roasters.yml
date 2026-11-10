@@ -1,14 +1,39 @@
 # UK roasters checked by scripts/drops.py (Shopify /products.json only).
-# Checked 2 Nov 2026. Blocked with a 429 then (retry later): Hard Lines, Ferraris,
-# Square Mile, Dark Arts, Assembly, Ozone, Workshop, North Star, Crankhouse,
-# Round Hill, Yallah, Colonna, Dark Woods, Foundry, Steampunk, Horsham,
-# 200 Degrees, Grind.
+# type: optional regex on the shop's own product_type (beans only). Without it a keyword filter guesses.
+# Types and the extra shops come from ~/frontpage/app/feeds.json, where they are tested.
+# Not yet tried from GitHub: Ferraris, Square Mile, Dark Arts, Workshop, North Star, Crankhouse,
+# Round Hill, Yallah, Colonna, Steampunk, Grind.
+
+# Welsh
+- name: Hard Lines
+  url: https://hard-lines.co.uk
+  type: ^coffee$
+- name: Coaltown Coffee
+  url: https://www.coaltowncoffee.co.uk
+  type: ^Coffee$
+- name: Dusty Ape
+  url: https://dustyape.com
+  type: ^(Single Origin|Coffee Blend)$
+- name: Black Mountain Roast
+  url: https://blackmountainroast.com
+  type: ^(decaf )?Coffee$
+- name: Quantum Coffee Roasters
+  url: https://quantumroasters.co.uk
+  type: ^Coffee$
+
+# Reviewed on the blog
 - name: Scout Coffee
   url: https://scoutcoffee.co.uk
 - name: White Rose Coffee Roasters
   url: https://whiterosecoffeeroasters.co.uk
+- name: Caffè Prima
+  url: https://www.caffeprima.co.uk
+  type: ^Coffee$
+
+# Rest of the UK
 - name: Has Bean
   url: https://hasbean.co.uk
+  type: ^coffee$
 - name: Origin Coffee
   url: https://origincoffee.co.uk
 - name: Quarter Horse
@@ -17,13 +42,40 @@
   url: https://cliftoncoffee.co.uk
 - name: Girls Who Grind Coffee
   url: https://girlswhogrindcoffee.com
+  type: ^Coffee$
 - name: Union
   url: https://unionroasted.com
 - name: Kiss the Hippo
   url: https://kissthehippo.com
+  type: ^Coffee$
 - name: Red Bank
   url: https://redbankcoffee.co.uk
 - name: Caravan
   url: https://caravanandco.com
 - name: Rave Coffee
   url: https://ravecoffee.co.uk
+  type: ^(Single Origin|Blend)$
+- name: Ozone Coffee
+  url: https://ozonecoffee.co.uk
+  type: ^coffee$
+- name: Volcano Coffee Works
+  url: https://volcanocoffeeworks.com
+  type: ^coffee$
+- name: Dark Woods Coffee
+  url: https://darkwoodscoffee.co.uk
+  type: ^coffee$
+- name: 200 Degrees
+  url: https://200degs.com
+  type: ^Coffee Bean$
+- name: Mission Coffee Works
+  url: https://missioncoffeeworks.com
+  type: ^Coffee$
+- name: Assembly Coffee
+  url: https://assemblycoffee.co.uk
+  type: ^Coffee$
+- name: Foundry Coffee Roasters
+  url: https://foundrycoffeeroasters.com
+  type: ^Coffee Beans$
+- name: Horsham Coffee Roaster
+  url: https://www.horshamcoffeeroaster.co.uk
+  type: ^Coffee$

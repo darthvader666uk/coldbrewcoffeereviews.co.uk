@@ -41,20 +41,21 @@ NOT_COFFEE = re.compile(
     r'\btea\b|hot choc|syrup|capsule|\bpods?\b|bundle|sample|taster|training|course',
     re.I)
 COFFEE = re.compile(r'coffee|bean|espresso|filter|blend|single origin|decaf|roast', re.I)
+GREEN = re.compile(r'\bgreen\b|unroasted', re.I)   # green-bean variants are for home roasters
 WEIGHT = re.compile(r'\b\d+(\.\d+)?\s?(g|kg)\b', re.I)
 
 
 # --- helpers -------------------------------------------------------------------------------
 
 def roasters():
-    """Tiny reader for _data/roasters.yml (a list of name/url pairs), so no PyYAML needed."""
+    """Tiny reader for _data/roasters.yml (name, url, optional type regex), so no PyYAML needed."""
     out = []
     for line in open(os.path.join(ROOT, '_data', 'roasters.yml'), encoding='utf-8'):
-        m = re.match(r'\s*-?\s*(name|url):\s*(.+?)\s*$', line)
+        m = re.match(r'\s*-?\s*(name|url|type):\s*(.+?)\s*$', line)
         if m and m.group(1) == 'name':
             out.append({'name': m.group(2)})
         elif m:
-            out[-1]['url'] = m.group(2).rstrip('/')
+            out[-1][m.group(1)] = m.group(2).strip('"\'').rstrip('/')
     return out
 
 
@@ -78,9 +79,12 @@ def fetch(base):
     return products
 
 
-def is_coffee(p):
+def is_coffee(p, type_re=None):
+    if type_re:   # the roaster's own product type, when roasters.yml gives one
+        return (bool(re.search(type_re, p.get('product_type') or '', re.I))
+                and not NOT_COFFEE.search(p['title']) and not GREEN.search(p['title']))
     name = f"{p.get('product_type') or ''} {p['title']}"
-    if NOT_COFFEE.search(name):
+    if NOT_COFFEE.search(name) or GREEN.search(p['title']):
         return False
     tags = ' '.join(p.get('tags') or [])
     variants = ' '.join(v.get('title') or '' for v in p.get('variants', []))
@@ -88,11 +92,12 @@ def is_coffee(p):
 
 
 def in_stock(p):
-    return sorted(v['id'] for v in p.get('variants', []) if v.get('available'))
+    return sorted(v['id'] for v in p.get('variants', []) if v.get('available') and not GREEN.search(v.get('title') or ''))
 
 
 def price(p):
-    prices = [float(v['price']) for v in p.get('variants', []) if v.get('available') and v.get('price')]
+    prices = [float(v['price']) for v in p.get('variants', [])
+              if v.get('available') and v.get('price') and not GREEN.search(v.get('title') or '')]
     return f'£{min(prices):.2f}' if prices else ''
 
 
@@ -128,7 +133,7 @@ def check(state_path):
         seen = state['stores'].get(r['url'])
         first = seen is None
         seen = seen or {}
-        for p in filter(is_coffee, products):
+        for p in (p for p in products if is_coffee(p, r.get('type'))):
             pid, stock = str(p['id']), in_stock(p)
             old = seen.get(pid)
             kind = None
