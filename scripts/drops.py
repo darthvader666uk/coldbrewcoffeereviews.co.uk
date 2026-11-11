@@ -9,7 +9,8 @@ State (seen products, their stock, the last 30 days of drops) lives in a JSON fi
 NOT kept on master. A roaster's first check only records what is listed, it never alerts.
 
 Credentials come from environment variables (GitHub secrets):
-  DISCORD_INSTANT_WEBHOOK (paid #instant-drops), DISCORD_WEEKLY_WEBHOOK (free #weekly-drops)
+  DISCORD_INSTANT_WEBHOOK (paid #instant-drops), DISCORD_WEEKLY_WEBHOOK (free #weekly-drops),
+  DISCORD_GENERAL_WEBHOOK (free #general: one teaser line per run with drops, no links to the coffees)
 
 Be polite: one store at a time, a pause between every request, and a 429 skips the store
 until the next run. Never print webhook URLs.
@@ -167,6 +168,17 @@ def check(state_path):
     for d in found:
         label = 'New' if d['kind'] == 'new' else 'Back in stock'
         discord('DISCORD_INSTANT_WEBHOOK', f"**{label} from {d['roaster']}:** {d['title']} {d['price']}\n{d['url']}")
+    if found:   # teaser for everyone else: counts and roasters only, the coffees stay a member perk
+        new, back = sum(d['kind'] == 'new' for d in found), sum(d['kind'] != 'new' for d in found)
+        what = ' and '.join(x for x in (plural(new, 'new coffee') if new else '',
+                                         (f'{back} back in stock' if new else f"{plural(back, 'coffee')} back in stock") if back else '') if x)
+        names = list(dict.fromkeys(d['roaster'] for d in found))
+        who = ' and '.join(names) if len(names) <= 2 else f"{', '.join(names[:2])} and {plural(len(names) - 2, 'more roaster')}"
+        one = len(found) == 1
+        roundup = '' if not new else (" and it'll be in Friday's roundup" if one else
+                                      " and they'll be in Friday's roundup" if not back else " and the new ones will be in Friday's roundup")
+        discord('DISCORD_GENERAL_WEBHOOK', f"**{what}** from {who} just now. Drops Members got {'it' if one else 'them'} in "
+                                           f"#instant-drops as {'it' if one else 'they'} went live{roundup}.\n<{SITE}/drops/>")
 
 
 # --- roundup: Friday ---------------------------------------------------------------------------
