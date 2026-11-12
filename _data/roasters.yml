@@ -36,6 +36,7 @@
 
 - name: Union
   url: https://unionroasted.com
+  type: ^(Coffee|Selection|Microlot|Cold Brew)$
   town: Silvertown
   area: London
 - name: Kiss the Hippo
@@ -45,6 +46,7 @@
   area: London
 - name: Caravan
   url: https://caravanandco.com
+  type: ^Coffee$
   town: London
   area: London
 - name: Ozone Coffee
@@ -89,6 +91,7 @@
   area: the South West
 - name: Origin Coffee
   url: https://origincoffee.co.uk
+  type: ^Coffee \((Blend|Decaf|Feature|Mainstay SO|Special Edition|Cold Brew)\)$
   town: Helston
   area: the South West
 

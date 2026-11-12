@@ -46,7 +46,7 @@ NOT_COFFEE = re.compile(
     r'gift|voucher|\bcards?\b|subscri|merch|equipment|brewer|brewing|grinder|kettle|\bscales?\b|'
     r'\bmugs?\b|keepcup|glass|tote|shirt|hoodie|\bhat\b|\bcap\b|apron|paper|dripper|v60|aeropress|'
     r'chemex|cafeti|french press|moka|machine|tamper|\bjug\b|pitcher|cleaning|descal|\bbook\b|'
-    r'\btea\b|hot choc|syrup|capsule|\bpods?\b|bundle|sample|taster|training|course',
+    r'\btea\b|hot choc|syrup|capsule|\bpods?\b|bundle|sample|taster|training|course|frother|\bmilk\b',
     re.I)
 COFFEE = re.compile(r'coffee|bean|espresso|filter|blend|single origin|decaf|roast', re.I)
 GREEN = re.compile(r'\bgreen\b|unroasted', re.I)   # green-bean variants are for home roasters
@@ -94,9 +94,8 @@ def is_coffee(p, type_re=None):
     name = f"{p.get('product_type') or ''} {p['title']}"
     if NOT_COFFEE.search(name) or GREEN.search(p['title']):
         return False
-    tags = ' '.join(p.get('tags') or [])
-    variants = ' '.join(v.get('title') or '' for v in p.get('variants', []))
-    return bool(COFFEE.search(f'{name} {tags}') or WEIGHT.search(variants))
+    variants = ' '.join(v.get('title') or '' for v in p.get('variants', []))   # tags not trusted: Origin tags kit "Coffee"
+    return bool(COFFEE.search(name) or WEIGHT.search(variants))
 
 
 def in_stock(p):
