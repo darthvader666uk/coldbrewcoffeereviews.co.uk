@@ -1,7 +1,8 @@
 name: Drops
 
 # Every hour -> check UK roasters for new coffees and restocks, alert #instant-drops on Discord.
-# Friday morning -> write the week's roundup post, publish it, then link it in #weekly-drops.
+# Friday morning -> write the week's roundup post, publish it, link it in #weekly-drops, then share it
+# on Bluesky and Facebook.
 # GitHub's own schedule skips most hourly runs on free accounts, so cron-job.org calls the
 # workflow_dispatch API instead: hourly at :17 with mode=check, Fridays 07:30 UTC with mode=roundup.
 # The check cron below stays as a backup (an extra check is harmless). The roundup has no cron here:
@@ -76,3 +77,13 @@ jobs:
       - name: Tell #weekly-drops
         if: steps.publish.outputs.published == 'yes'
         run: python3 scripts/drops.py roundup --state drops-state.json
+      # Pushes made with the workflow token never start social.yml, so share it from here (Bluesky and Facebook only)
+      - name: Share on Bluesky and Facebook
+        if: steps.publish.outputs.published == 'yes'
+        env:
+          META_PAGE_TOKEN: ${{ secrets.META_PAGE_TOKEN }}
+          META_PAGE_ID: ${{ secrets.META_PAGE_ID }}
+          BSKY_HANDLE: ${{ secrets.BSKY_HANDLE }}
+          BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python3 scripts/social.py announce _posts/$(date +%F)-coffee-drops-$(date +%F).html

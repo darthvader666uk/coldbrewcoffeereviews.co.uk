@@ -115,7 +115,7 @@ def bluesky_session():
 
 
 def post_bluesky(p):
-    text = f"{p['lead']}: {p['title']}\n\n{beans(p.get('rating'))}"
+    text = f"{p['lead']}: {p['title']}\n\n{beans(p.get('rating'))}".strip()
     if len(text) > 280:
         text = text[:277] + '...'
     if DRY:
@@ -124,8 +124,8 @@ def post_bluesky(p):
     auth = {'Authorization': f"Bearer {s['accessJwt']}"}
     external = {'uri': p['url'], 'title': p['title'], 'description': p.get('description', '')}
     if p['image_url']:
-        img = urllib.request.urlopen(urllib.request.Request(p['image_url'], headers={'User-Agent': 'last-shift-coffee/1.0'})).read()
-        mime = 'image/webp' if p['image_url'].endswith('.webp') else 'image/png' if p['image_url'].endswith('.png') else 'image/jpeg'
+        with urllib.request.urlopen(urllib.request.Request(p['image_url'], headers={'User-Agent': 'last-shift-coffee/1.0'})) as r:
+            img, mime = r.read(), r.headers.get_content_type()   # drops covers are Shopify URLs ending in ?width=
         if len(img) < 1_000_000:
             blob = http('POST', f'{BSKY}/com.atproto.repo.uploadBlob', raw=img, headers={**auth, 'Content-Type': mime})
             external['thumb'] = blob['blob']
@@ -138,7 +138,7 @@ def post_bluesky(p):
 
 
 def post_facebook(p):
-    message = f"{p['lead']}: {p['title']}\n\n{p.get('description', '')}\n\n{beans(p.get('rating'))}"
+    message = f"{p['lead']}: {p['title']}\n\n{p.get('description', '')}\n\n{beans(p.get('rating'))}".strip()
     if DRY:
         return print('  facebook (dry run):', message.replace('\n', ' | '))
     r = graph('POST', f"{ENV('META_PAGE_ID')}/feed", message=message, link=p['url'])
@@ -168,11 +168,14 @@ def announce(files, archive=False):
         f = f.strip().strip('`\'"').rstrip('.,')
         p = front_matter(f)
         p['lead'] = f'From the archive ({os.path.basename(f)[:4]})' if archive else 'New review'
+        drops = p.get('method') == 'Coffee Drops'
+        if drops:   # weekly roundup: no Instagram, its only image is a roaster's product photo
+            p['lead'], p['title'] = "This week's coffee drops", p['title'].removeprefix('Coffee Drops: ')
         print('Announcing', p['url'])
         if not DRY and not wait_until_live(p['url']):
             failed.append(f'{f}: page never went live')
             continue
-        for name, fn in [('bluesky', post_bluesky), ('facebook', post_facebook), ('instagram', post_instagram)]:
+        for name, fn in [('bluesky', post_bluesky), ('facebook', post_facebook), ('instagram', post_instagram)][:2 if drops else 3]:
             try:
                 fn(p)
             except Exception as e:

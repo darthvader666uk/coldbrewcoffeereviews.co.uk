@@ -237,7 +237,8 @@ def roundup(state_path):
         'author: Stuart Nightingale',
         'method: Coffee Drops',
         'tags:\n- Drops',
-        *([f'image: "{sized(covers[0], 1200)}"', 'covers:', *[f'- "{sized(c, 400)}"' for c in covers]] if covers else []),
+        # image is JPEG to stay under Bluesky's 1MB thumbnail limit
+        *([f'image: "{sized(covers[0], 1200)}&format=jpg"', 'covers:', *[f'- "{sized(c, 400)}"' for c in covers]] if covers else []),
         f'description: "{plural(len(drops), "new coffee")} from '
         + (f'{busiest[0]} this week."' if len(by_roaster) == 1 else f'{shops} this week, including {" and ".join(busiest)}."'),
         '---', '', *body, ''])
