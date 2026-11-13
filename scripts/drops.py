@@ -56,10 +56,10 @@ WEIGHT = re.compile(r'\b\d+(\.\d+)?\s?(g|kg)\b', re.I)
 # --- helpers -------------------------------------------------------------------------------
 
 def roasters():
-    """Tiny reader for _data/roasters.yml (name, url, optional type regex), so no PyYAML needed."""
+    """Tiny reader for _data/roasters.yml (name, url, town, optional type regex), so no PyYAML needed."""
     out = []
     for line in open(os.path.join(ROOT, '_data', 'roasters.yml'), encoding='utf-8'):
-        m = re.match(r'\s*-?\s*(name|url|type):\s*(.+?)\s*$', line)
+        m = re.match(r'\s*-?\s*(name|url|type|town):\s*(.+?)\s*$', line)
         if m and m.group(1) == 'name':
             out.append({'name': m.group(2)})
         elif m:
@@ -106,6 +106,11 @@ def price(p):
     prices = [float(v['price']) for v in p.get('variants', [])
               if v.get('available') and v.get('price') and not GREEN.search(v.get('title') or '')]
     return f'£{min(prices):.2f}' if prices else ''
+
+
+def sized(src, width):
+    """Shopify CDN image at a given width, so the page never pulls the full-size original."""
+    return f"{src}{'&' if '?' in src else '?'}width={width}"
 
 
 def plural(count, word):
@@ -155,7 +160,8 @@ def check(state_path):
             seen[pid] = {'title': p['title'], 'stock': stock}
             if kind:
                 found.append({'kind': kind, 'roaster': r['name'], 'title': p['title'], 'price': price(p),
-                              'url': f"{r['url']}/products/{p['handle']}", 'at': now})
+                              'url': f"{r['url']}/products/{p['handle']}", 'at': now,
+                              'image': ((p.get('images') or [{}])[0]).get('src', '')})
         state['stores'][r['url']] = seen
         print(f'  {len(seen)} coffees{" (first check, recorded only)" if first else ""}')
 
@@ -194,17 +200,36 @@ def roundup(state_path):
         by_roaster.setdefault(d['roaster'], []).append(d)
     nice = f'{today.day} {today:%B %Y}'
     coffees, shops = plural(len(drops), 'coffee'), plural(len(by_roaster), 'UK roaster')
-    busiest = sorted(by_roaster, key=lambda n: -len(by_roaster[n]))[:2]
+    order = sorted(by_roaster, key=lambda n: (-len(by_roaster[n]), n))   # busiest roaster first
+    busiest = order[:2]
+    towns = {r['name']: r.get('town', '') for r in roasters()}
+    prices = [float(d['price'][1:]) for d in drops if d['price']]
+    cheapest = f'£{min(prices):.2f}' if prices else ''
+    top = len(by_roaster[order[0]])
+    who = (f', and {order[0]} were the busiest with {top}' if len(order) > 1 and top > 1 else '')
     body = [f'<p class="intro">{INTROS[today.isocalendar()[1] % len(INTROS)]}</p>',
-            f'<p>The drops bot spotted {coffees} from {shops} this week. Every link goes straight to the roaster, '
+            '<div class="drop-stats">'
+            f'<div><b>{len(drops)}</b>new {"coffee" if len(drops) == 1 else "coffees"}</div>'
+            f'<div><b>{len(order)}</b>{"roaster" if len(order) == 1 else "roasters"}</div>'
+            + (f'<div><b>{cheapest}</b>cheapest bag</div>' if cheapest else '') + '</div>',
+            f'<p>The drops bot spotted {coffees} from {shops} this week{who}. Every link goes straight to the roaster, '
             "so they get the sale (and some of these won't hang around long).</p>"]
-    for name, items in sorted(by_roaster.items()):
-        body.append(f'\n<h3>{html.escape(name)}</h3>\n<ul>')
-        body += [f'<li><a href="{html.escape(d["url"])}">{html.escape(d["title"])}</a>'
-                 f'{", " + d["price"] if d["price"] else ""}</li>' for d in items]
-        body.append('</ul>')
+    for name in order:
+        items = by_roaster[name]
+        town = f'{towns[name]} &middot; ' if towns.get(name) else ''
+        body.append(f'\n<h3 class="drop-roaster">{html.escape(name)} <span>{town}{len(items)} new</span></h3>\n<div class="drop-grid">')
+        for d in items:
+            img = (f'<img src="{html.escape(sized(d["image"], 480))}" alt="" loading="lazy" width="480" height="480">'
+                   if d.get('image') else '<span class="drop-noimg"></span>')
+            body.append(f'<a class="drop" href="{html.escape(d["url"])}" target="_blank" rel="noopener">{img}'
+                        f'<span class="drop-name">{html.escape(d["title"])}</span>'
+                        f'<span class="drop-price">{d["price"]}</span></a>')
+        body.append('</div>')
     body.append("\n<p>Drops Members get these the moment the bot spots them, in #instant-drops on the Last Shift Coffee "
                 "Discord. The details are on the <a href=\"{{ '/drops/' | relative_url }}\">Coffee Drops</a> page.</p>")
+    # Cover for the home page card: one bag from each of the busiest roasters, then fill up to 4
+    pics = [by_roaster[n][0] for n in order] + [d for n in order for d in by_roaster[n][1:]]
+    covers = [d['image'] for d in pics if d.get('image')][:4]
     slug = f'coffee-drops-{today:%Y-%m-%d}'   # URLs are /:year/:month/:title.html, so the date keeps them unique
     post = '\n'.join([
         '---',
@@ -212,6 +237,7 @@ def roundup(state_path):
         'author: Stuart Nightingale',
         'method: Coffee Drops',
         'tags:\n- Drops',
+        *([f'image: "{sized(covers[0], 1200)}"', 'covers:', *[f'- "{sized(c, 400)}"' for c in covers]] if covers else []),
         f'description: "{plural(len(drops), "new coffee")} from '
         + (f'{busiest[0]} this week."' if len(by_roaster) == 1 else f'{shops} this week, including {" and ".join(busiest)}."'),
         '---', '', *body, ''])

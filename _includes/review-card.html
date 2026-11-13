@@ -1,7 +1,12 @@
 {%- assign p = include.post -%}
 <article class="card">
   <a class="card-link" href="{{ p.url | relative_url }}">
-    {%- if p.image %}
+    {%- if p.covers %}
+    <div class="card-mosaic">
+      {%- for c in p.covers limit: 4 %}<img src="{{ c }}" alt="" loading="lazy" width="400" height="400">{% endfor %}
+      <span class="card-badge">{{ p.method }}</span>
+    </div>
+    {%- elsif p.image %}
     <img class="card-img" src="{{ p.image | relative_url }}" alt="" loading="lazy" width="640" height="360">
     {%- endif %}
     <div class="card-body">
