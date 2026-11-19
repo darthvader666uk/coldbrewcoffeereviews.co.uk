@@ -20,6 +20,10 @@ concurrency:
   group: social
   cancel-in-progress: false
 
+permissions:
+  contents: write
+  pages: write
+
 env:
   META_PAGE_TOKEN: ${{ secrets.META_PAGE_TOKEN }}
   META_PAGE_ID: ${{ secrets.META_PAGE_ID }}
@@ -48,6 +52,11 @@ jobs:
           fi
           if [ -z "$files" ]; then echo "No new reviews in this push."; exit 0; fi
           python3 scripts/social.py announce $files
+      - name: Save the post links on the review
+        if: success() || failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: scripts/save-links.sh
 
   archive:
     if: github.event_name == 'schedule' && github.event.schedule == '0 18 * * 2,5'
@@ -56,6 +65,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: Share today's archive review
         run: python3 scripts/social.py archive scripts/archive.txt
+      - name: Save the post links on the review
+        if: success() || failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: scripts/save-links.sh
 
   digest:
     if: (github.event_name == 'schedule' && github.event.schedule == '0 8 * * *') || (github.event_name == 'workflow_dispatch' && inputs.post == '')

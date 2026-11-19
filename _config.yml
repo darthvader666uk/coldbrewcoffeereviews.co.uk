@@ -11,6 +11,14 @@ permalink: /:year/:month/:title.html
 paginate: 9
 paginate_path: "/blog/page:num/"
 
+# Social profiles: listed in the footer, and the seo tag adds them as sameAs
+social:
+  name: Last Shift Coffee
+  links:
+    - https://www.instagram.com/lastshiftcoffee/
+    - https://www.facebook.com/1336439152893577
+    - https://bsky.app/profile/lastshiftcoffee.co.uk
+
 plugins:
   - jekyll-paginate
   - jekyll-seo-tag

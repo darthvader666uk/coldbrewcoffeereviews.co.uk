@@ -24,6 +24,16 @@ layout: default
 
   {%- if page.scorecard %}{% include scorecard.html %}{% endif %}
 
+  {%- capture social -%}
+    {%- if page.instagram_post %}<a href="{{ page.instagram_post }}">Instagram</a>|{% endif -%}
+    {%- if page.facebook_post %}<a href="{{ page.facebook_post }}">Facebook</a>|{% endif -%}
+    {%- if page.bluesky_post %}<a href="{{ page.bluesky_post }}">Bluesky</a>|{% endif -%}
+  {%- endcapture -%}
+  {%- assign social = social | split: '|' -%}
+  {%- if social.size > 0 %}
+  <p class="social-posts">Have your say on {% for l in social %}{{ l }}{% unless forloop.last %}{% if forloop.rindex == 2 %} or {% else %}, {% endif %}{% endunless %}{% endfor %}.</p>
+  {%- endif %}
+
   <nav class="post-nav" aria-label="More reviews">
     {%- if page.previous %}<a class="prev" href="{{ page.previous.url | relative_url }}"><span>Older</span>{{ page.previous.title }}</a>{% endif %}
     {%- if page.next %}<a class="next" href="{{ page.next.url | relative_url }}"><span>Newer</span>{{ page.next.title }}</a>{% endif %}

@@ -87,3 +87,8 @@ jobs:
           BSKY_APP_PASSWORD: ${{ secrets.BSKY_APP_PASSWORD }}
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: python3 scripts/social.py announce _posts/$(date +%F)-coffee-drops-$(date +%F).html
+      - name: Save the post links on the review
+        if: steps.publish.outputs.published == 'yes' && (success() || failure())
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: scripts/save-links.sh

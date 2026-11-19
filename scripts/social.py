@@ -156,7 +156,9 @@ def post_bluesky(p):
         record['embed'] = {'$type': 'app.bsky.embed.external', 'external': external}
     r = http('POST', f'{BSKY}/com.atproto.repo.createRecord',
              {'repo': s['did'], 'collection': 'app.bsky.feed.post', 'record': record}, headers=auth)
-    print('  bluesky: posted', 'https://bsky.app/profile/' + s['handle'] + '/post/' + r['uri'].rsplit('/', 1)[1])
+    url = 'https://bsky.app/profile/' + s['handle'] + '/post/' + r['uri'].rsplit('/', 1)[1]
+    print('  bluesky: posted', url)
+    return url
 
 
 def post_facebook(p):
@@ -173,7 +175,9 @@ def post_facebook(p):
                   **{f'attached_media[{i}]': json.dumps({'media_fbid': x}) for i, x in enumerate(ids)})
     else:
         r = graph('POST', f'{page}/feed', message=message, link=p['url'])
-    print('  facebook: posted', r.get('id'))
+    url = graph('GET', r['id'], fields='permalink_url').get('permalink_url')
+    print('  facebook: posted', url)
+    return url
 
 
 def social_images(p):
@@ -208,7 +212,19 @@ def post_instagram(p):
                 for i, u in enumerate(imgs, 1)]
         cid = container(media_type='CAROUSEL', children=','.join(kids), caption=caption)
     r = graph('POST', f'{ig}/media_publish', creation_id=cid)
-    print('  instagram: posted', graph('GET', r['id'], fields='permalink').get('permalink'))
+    url = graph('GET', r['id'], fields='permalink').get('permalink')
+    print('  instagram: posted', url)
+    return url
+
+
+def record_links(path, links):
+    """Save the post links in the review's front matter (the layout lists them at the bottom).
+    Links already there are kept, so an archive re-share never replaces the first post."""
+    text = open(path, encoding='utf-8').read()
+    _, fm, body = text.split('---', 2)
+    add = ''.join(f'{k}_post: {v}\n' for k, v in links.items() if v and not re.search(rf'^{k}_post:', fm, re.M))
+    if add and not DRY:
+        open(path, 'w', encoding='utf-8').write(f'---{fm.rstrip()}\n{add}---{body}')
 
 
 def announce(files, archive=False):
@@ -224,12 +240,14 @@ def announce(files, archive=False):
         if not DRY and not wait_until_live(p['url']):
             failed.append(f'{f}: page never went live')
             continue
+        links = {}
         for name, fn in [('bluesky', post_bluesky), ('facebook', post_facebook), ('instagram', post_instagram)][:2 if drops else 3]:
             try:
-                fn(p)
+                links[name] = fn(p)
             except Exception as e:
                 print(f'  {name}: FAILED', e)
                 failed.append(f'{name}: {e}')
+        record_links(f, links)
     if failed:
         notify('Last Shift Coffee: sharing failed', '\n'.join(failed), SITE)
         sys.exit(1)

@@ -132,6 +132,7 @@ main.wrap { padding-top: 2.5rem; padding-bottom: 4rem; min-height: 60vh; }
 .post-nav a:hover { border-color: var(--red); }
 .post-nav span { display: block; color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .1em; }
 .post-nav .next { grid-column: 2; text-align: right; }
+.social-posts { margin: 2.5rem 0 0; text-align: center; color: var(--muted); }
 
 /* Footer */
 .site-footer { border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
