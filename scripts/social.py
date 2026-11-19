@@ -1,7 +1,7 @@
 """Share new reviews on social media, and send a daily digest of replies.
 
   python scripts/social.py announce <post file>... [--dry-run]
-  python scripts/social.py archive scripts/archive.txt [--dry-run]   (posts whatever is dated today)
+  python scripts/social.py archive scripts/archive.txt [--dry-run]   (posts whatever is due and not shared yet)
   python scripts/social.py digest [--dry-run]
 
 Credentials come from environment variables (GitHub secrets):
@@ -341,11 +341,14 @@ if __name__ == '__main__':
         announce(args[1:])
     elif args[:1] == ['archive']:
         today = dt.datetime.now(dt.timezone.utc).date().isoformat()
-        due = [line.split()[1] for line in open(args[1]) if line.startswith(today)]
+        # Due today or overdue (GitHub sometimes runs the 18:00 job after midnight), and not shared yet:
+        # a shared post has its links saved in the front matter.
+        due = [f for d, f in (line.split()[:2] for line in open(args[1]) if re.match(r'\d{4}-\d{2}-\d{2} ', line))
+               if d <= today and not re.search(r'^\w+_post:', open(f, encoding='utf-8').read().split('---', 2)[1], re.M)]
         if due:
             announce(due, archive=True)
         else:
-            print('Nothing in the archive list for', today)
+            print('Nothing due in the archive list on', today)
     elif args[:1] == ['digest']:
         digest()
     else:
