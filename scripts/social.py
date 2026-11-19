@@ -115,50 +115,99 @@ def bluesky_session():
 
 
 def post_bluesky(p):
-    text = f"{p['lead']}: {p['title']}\n\n{beans(p.get('rating'))}".strip()
-    if len(text) > 280:
-        text = text[:277] + '...'
+    imgs = social_images(p)
+    if len(imgs) > 1:   # photo post: up to 4 images (cover + the last 3, usually the brew), link in the text
+        imgs = imgs if len(imgs) <= 4 else imgs[:1] + imgs[-3:]
+        link = p['url'].removeprefix('https://www.')
+        desc = re.sub(r'\s*Scores \d beans out of 5\.$', '', p.get('description', ''))   # the beans line says it
+        head, tail = f"{p['lead']}: {p['title']}", f"{beans(p.get('rating'))}\n\n{link}"
+        room = 300 - len(head) - len(tail) - 4
+        if len(desc) > room:
+            desc = desc[:room - 3].rsplit(' ', 1)[0] + '...'
+        text = '\n\n'.join(x for x in (head, desc, tail) if x)
+    else:
+        text = f"{p['lead']}: {p['title']}\n\n{beans(p.get('rating'))}".strip()
+        if len(text) > 280:
+            text = text[:277] + '...'
     if DRY:
-        return print('  bluesky (dry run):', text.replace('\n', ' | '))
+        return print(f'  bluesky (dry run, {f"{len(imgs)} images" if len(imgs) > 1 else "link card"}):', text.replace('\n', ' | '))
     s = bluesky_session()
     auth = {'Authorization': f"Bearer {s['accessJwt']}"}
-    external = {'uri': p['url'], 'title': p['title'], 'description': p.get('description', '')}
-    if p['image_url']:
-        with urllib.request.urlopen(urllib.request.Request(p['image_url'], headers={'User-Agent': 'last-shift-coffee/1.0'})) as r:
-            img, mime = r.read(), r.headers.get_content_type()   # drops covers are Shopify URLs ending in ?width=
-        if len(img) < 1_000_000:
-            blob = http('POST', f'{BSKY}/com.atproto.repo.uploadBlob', raw=img, headers={**auth, 'Content-Type': mime})
-            external['thumb'] = blob['blob']
     record = {'$type': 'app.bsky.feed.post', 'text': text, 'langs': ['en'],
-              'createdAt': dt.datetime.now(dt.timezone.utc).isoformat().replace('+00:00', 'Z'),
-              'embed': {'$type': 'app.bsky.embed.external', 'external': external}}
+              'createdAt': dt.datetime.now(dt.timezone.utc).isoformat().replace('+00:00', 'Z')}
+    if len(imgs) > 1:
+        images = []
+        for i, u in enumerate(imgs, 1):
+            img = open(u.removeprefix(SITE + '/'), 'rb').read()   # the slides are in the checkout
+            blob = http('POST', f'{BSKY}/com.atproto.repo.uploadBlob', raw=img, headers={**auth, 'Content-Type': 'image/jpeg'})
+            images.append({'image': blob['blob'], 'alt': f"{p['title']}, photo {i} of {len(imgs)}"})
+        end = len(text.encode())
+        record['facets'] = [{'index': {'byteStart': end - len(link.encode()), 'byteEnd': end},
+                             'features': [{'$type': 'app.bsky.richtext.facet#link', 'uri': p['url']}]}]
+        record['embed'] = {'$type': 'app.bsky.embed.images', 'images': images}
+    else:
+        external = {'uri': p['url'], 'title': p['title'], 'description': p.get('description', '')}
+        if p['image_url']:
+            with urllib.request.urlopen(urllib.request.Request(p['image_url'], headers={'User-Agent': 'last-shift-coffee/1.0'})) as r:
+                img, mime = r.read(), r.headers.get_content_type()   # drops covers are Shopify URLs ending in ?width=
+            if len(img) < 1_000_000:
+                blob = http('POST', f'{BSKY}/com.atproto.repo.uploadBlob', raw=img, headers={**auth, 'Content-Type': mime})
+                external['thumb'] = blob['blob']
+        record['embed'] = {'$type': 'app.bsky.embed.external', 'external': external}
     r = http('POST', f'{BSKY}/com.atproto.repo.createRecord',
              {'repo': s['did'], 'collection': 'app.bsky.feed.post', 'record': record}, headers=auth)
     print('  bluesky: posted', 'https://bsky.app/profile/' + s['handle'] + '/post/' + r['uri'].rsplit('/', 1)[1])
 
 
 def post_facebook(p):
+    imgs = social_images(p)
     message = f"{p['lead']}: {p['title']}\n\n{p.get('description', '')}\n\n{beans(p.get('rating'))}".strip()
+    if len(imgs) > 1:   # multi-photo post, the link goes in the text (a link card can't sit with photos)
+        message += f"\n\nFull review: {p['url']}"
     if DRY:
-        return print('  facebook (dry run):', message.replace('\n', ' | '))
-    r = graph('POST', f"{ENV('META_PAGE_ID')}/feed", message=message, link=p['url'])
+        return print(f'  facebook (dry run, {f"{len(imgs)} images" if len(imgs) > 1 else "link card"}):', message.replace('\n', ' | '))
+    page = ENV('META_PAGE_ID')
+    if len(imgs) > 1:
+        ids = [graph('POST', f'{page}/photos', url=u, published='false')['id'] for u in imgs]
+        r = graph('POST', f'{page}/feed', message=message,
+                  **{f'attached_media[{i}]': json.dumps({'media_fbid': x}) for i, x in enumerate(ids)})
+    else:
+        r = graph('POST', f'{page}/feed', message=message, link=p['url'])
     print('  facebook: posted', r.get('id'))
 
 
+def social_images(p):
+    """Social slides: every JPEG in the post's `social:` folder (4:5, 1080x1350), else the main image."""
+    d = p.get('social', '').strip('/')
+    files = sorted(f for f in os.listdir(d) if f.lower().endswith(('.jpg', '.jpeg'))) if d and os.path.isdir(d) else []
+    return [f'{SITE}/{d}/{f}' for f in files][:20] or [p['image_url']]
+
+
 def post_instagram(p):
-    if not p['image_url'].lower().endswith(('.jpg', '.jpeg')):
-        return print('  instagram: skipped, Instagram only accepts JPEG and the main image is', p['image_url'].rsplit('.', 1)[-1])
+    imgs = social_images(p)
+    if not all(u.lower().endswith(('.jpg', '.jpeg')) for u in imgs):
+        return print('  instagram: skipped, Instagram only accepts JPEG and the main image is', imgs[0].rsplit('.', 1)[-1])
     caption = (f"{p['lead']}: {p['title']}\n\n{p.get('description', '')}\n\n{beans(p.get('rating'))}\n\n"
                f"Full review at lastshiftcoffee.co.uk\n\n{HASHTAGS}")
     if DRY:
-        return print('  instagram (dry run):', caption.replace('\n', ' | ')[:200])
+        return print(f'  instagram (dry run, {len(imgs)} image(s)):', caption.replace('\n', ' | ')[:200])
     ig = ENV('META_IG_ID')
-    c = graph('POST', f'{ig}/media', image_url=p['image_url'], caption=caption, alt_text=p['title'])
-    for _ in range(20):
-        if graph('GET', c['id'], fields='status_code').get('status_code') == 'FINISHED':
-            break
-        time.sleep(5)
-    r = graph('POST', f'{ig}/media_publish', creation_id=c['id'])
+
+    def container(**params):
+        c = graph('POST', f'{ig}/media', **params)
+        for _ in range(20):
+            if graph('GET', c['id'], fields='status_code').get('status_code') == 'FINISHED':
+                break
+            time.sleep(5)
+        return c['id']
+
+    if len(imgs) == 1:
+        cid = container(image_url=imgs[0], caption=caption, alt_text=p['title'])
+    else:   # carousel: caption on the parent only, alt text on each slide
+        kids = [container(image_url=u, is_carousel_item='true', alt_text=f"{p['title']}, photo {i} of {len(imgs)}")
+                for i, u in enumerate(imgs, 1)]
+        cid = container(media_type='CAROUSEL', children=','.join(kids), caption=caption)
+    r = graph('POST', f'{ig}/media_publish', creation_id=cid)
     print('  instagram: posted', graph('GET', r['id'], fields='permalink').get('permalink'))
 
 
