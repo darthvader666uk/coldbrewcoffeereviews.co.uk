@@ -2,7 +2,7 @@
 layout: page
 permalink: /roasters/
 title: UK Speciality Coffee Roasters
-description: "26 UK speciality coffee roasters, Welsh roasters first, with where they roast and a direct link to buy their beans. Every one is watched for new coffees and restocks."
+description: "29 UK speciality coffee roasters, Welsh roasters first, with where they roast and a direct link to buy their beans. Every one is watched for new coffees and restocks."
 ---
 {%- assign roasters = site.data.roasters -%}
 {%- assign areas = roasters | map: "area" | uniq -%}

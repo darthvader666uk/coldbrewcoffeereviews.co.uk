@@ -4,7 +4,7 @@
 # area: the /roasters/ section, in the order first used here (Wales first).
 # reviewed_as: the roaster: value on this blog's review posts, to link them.
 # Towns checked 10 Nov 2026 (roaster sites first).
-# Not yet tried from GitHub: Ferraris, Square Mile, Dark Arts, Workshop, North Star, Crankhouse,
+# Not yet tried from GitHub: Ferraris, Dark Arts, Workshop, North Star, Crankhouse,
 # Round Hill, Yallah, Colonna, Steampunk, Grind.
 
 - name: Hard Lines
@@ -68,6 +68,16 @@
   url: https://assemblycoffee.co.uk
   type: ^Coffee$
   town: Brixton
+  area: London
+- name: Square Mile
+  url: https://squaremilecoffee.com
+  type: ^Coffee$
+  town: London
+  area: London
+- name: Hermanos
+  url: https://hermanoscoffeeroasters.com
+  type: ^Coffee Beans$
+  town: London
   area: London
 
 - name: Clifton Coffee
@@ -140,4 +150,9 @@
   url: https://www.horshamcoffeeroaster.co.uk
   type: ^Coffee$
   town: Horsham
+  area: the South East
+- name: Craft House Coffee
+  url: https://www.crafthousecoffee.co.uk
+  type: ^Coffee$
+  town: Wivelsfield Green
   area: the South East
