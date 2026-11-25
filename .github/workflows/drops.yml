@@ -51,7 +51,13 @@ jobs:
           git init -q -b bot-state
           git add drops-state.json
           git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -qm 'Drops state'
-          git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" bot-state
+          # Retry: GitHub sometimes rejects pushes with a server error during an outage (25 Nov 2026).
+          # Alerts have already gone out, so a lost save means repeat alerts on the next run.
+          for try in 1 2 3 4 5; do
+            git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" bot-state && exit 0
+            echo "Push failed (try $try of 5), retrying in 30 s"; sleep 30
+          done
+          exit 1
 
   roundup:
     if: inputs.mode == 'roundup'
